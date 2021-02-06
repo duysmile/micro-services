@@ -1,0 +1,24 @@
+{
+  "name": "micro-services",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duysmile/micro-services.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/duysmile/micro-services/issues"
+  },
+  "homepage": "https://github.com/duysmile/micro-services#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "jaeger-client": "^3.18.1"
+  }
+}
