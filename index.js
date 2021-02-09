@@ -1,5 +1,5 @@
 require('dotenv').config();
-const initJaegerTracer = require('jaeger-client').initTracer;
+const initJaegerTracer = require('jaeger-client').initTracerFromEnv;
 const express = require('express');
 
 const port = process.env.PORT || 3000;
@@ -15,14 +15,14 @@ function initTracer(serviceName) {
     const config = {
         serviceName,
         sampler: { type: 'const', param: 1 },
-        reporter: {
-            // Provide the traces endpoint; this forces the client to connect directly to the Collector and send
-            // spans over HTTP
-            collectorEndpoint: 'http://localhost:14268/api/traces',
-            // Provide username and password if authentication is enabled in the Collector
-            // username: '',
-            // password: '',
-        },
+        // reporter: {
+        //     // Provide the traces endpoint; this forces the client to connect directly to the Collector and send
+        //     // spans over HTTP
+        //     collectorEndpoint: 'http://localhost:14268/api/traces',
+        //     // Provide username and password if authentication is enabled in the Collector
+        //     // username: '',
+        //     // password: '',
+        // },
     };
 
     return initJaegerTracer(config);
@@ -63,7 +63,24 @@ function tracingMiddleware(req, res, next) {
 app.use(tracingMiddleware);
 app.get('/health-check', (req, res) => res.send('OK'));
 
-app.get(`/service-${port}`, (req, res, next) => {
+app.get(`/service-${port}`, async (req, res, next) => {
+    const tracer = openTracing.globalTracer();
+    const span = tracer.startSpan('get-data-service', {
+        childOf: req.span,
+    });
+
+    span.log({
+        event: 'get-service',
+        message: 'port ' + port,
+    });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    span.log({
+        event: 'delay',
+    });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    span.finish();
     res.json({
         data: `service-${port}`,
     });
